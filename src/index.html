@@ -12,10 +12,13 @@
     var crane_state_placing = "placing";
     var crane_state_rising = "rising";
 
+    var crane_update_frequency = 250;
     var max_heat = 10;
 
     var game_state_gameover = "gameover";
+    var game_state_victory = "victory";
     var game_state_crane = "crane";
+
     var game_state = game_state_crane;
     var level = [
         [wall, wall , wall , wall , wall , wall , wall , wall , wall],
@@ -163,6 +166,8 @@
             update_in_crane_state();
         } else if (game_state == game_state_gameover) {
             update_in_gameover_state();
+        } else if (game_state == game_state_victory) {
+            update_in_victory_state();
         }
     }
 
@@ -176,10 +181,19 @@
         context.fillText("BOOM", 180, 200);
     }
 
+    function update_in_victory_state() {
+        var canvas = document.getElementById('game_screen');
+        var context = canvas.getContext('2d');
+        context.fillStyle = "rgb(0, 255, 0)";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.fillStyle = "rgb(0, 0, 0)";
+        context.fontStyle = "30pt Arial";
+        context.fillText("You saved the day", 180, 200);
+    }
     function update_in_crane_state() {
         if (crane.state == crane_state_placing) {
             var now = Date.now();
-            if (1000 < now - crane.last_animation_tick) {
+            if (crane_update_frequency < now - crane.last_animation_tick) {
                 crane.y += 1;
                 if (crane.held_item != undefined) {
                     crane.held_item.y += 1;
@@ -197,7 +211,13 @@
                         crane.state = crane_state_rising;
                     }
                 } else {
-                    if (level[crane.y + 2][crane.x] == wall) {
+                    if (crane.y + 1 == chute.y && crane.x == chute.x) {
+                        if (crane.held_item == core) {
+                            game_state = game_state_victory;
+                        } else {
+                            crane.state = crane_state_rising;
+                        }
+                    } else if (level[crane.y + 2][crane.x] == wall) {
                         crane.held_item = undefined;
                         crane.state = crane_state_rising;
                     }
@@ -207,7 +227,7 @@
 
         if (crane.state == crane_state_rising) {
             var now = Date.now();
-            if (1000 < now - crane.last_animation_tick) {
+            if (crane_update_frequency < now - crane.last_animation_tick) {
                 crane.y -= 1;
                 if (crane.held_item != undefined) {
                     crane.held_item.y -= 1;

@@ -3,8 +3,6 @@
 6: Add dropping the lead into the reactor
 8: Add picking up the reactor core without lead inserted
 9: Add picking up the reactor with lead inserted
-10: Add dropping the reactor into the chute
-11: Add dropping the reactor core
 13: Display some textbox explaining the mission and the controls
 
 - done -
@@ -17,6 +15,9 @@
 - about 1 hour in-
 14: Add picking up something (reactor) -done-
 7: Add the reactor core in one place -done-
+11: Add dropping the reactor core
 12: Add move limit -done-
 - about 5 hours in -
 3: Add the chute
+10: Add dropping the reactor into the chute
+- about 7 hours in -
