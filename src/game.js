@@ -3,6 +3,11 @@
     var empty = " ";
     var wall = "wall";
     var core = "core";
+
+    var crane_state_ceiling = "ceiling";
+    var crane_state_placing = "placing";
+    var crane_state_rising = "rising";
+
     var level = [
         [wall, wall , wall , wall , wall , wall , wall , wall , wall],
         [wall, empty, empty, empty, empty, empty, empty, empty, wall],   
@@ -12,13 +17,19 @@
         [wall, wall , wall , wall , wall , wall , wall , wall , wall],
     ];
     
+    var core = {
+        x : 1,
+        y : 2
+    }
+
     var crane = {
-        x : 1
+        x : 1,
+        y : 1,
+        held_item : core,
+        state : crane_state_placing,
+        last_animation_tick : Date.now()
     };
 
-    var core = {
-        x : 5
-    }
     var keysDown = {};
 
     function draw_level() {
@@ -41,8 +52,8 @@
 
     function draw_crane() {
         var canvas = document.getElementById('game_screen');
-        var y = 1 * 50;
         var x = crane.x * 50;
+        var y = crane.y * 50;
         
         var context = canvas.getContext('2d');
         context.fillStyle="rgb(127,127,127)";
@@ -58,11 +69,11 @@
 
     function draw_reactor() {
         var canvas = document.getElementById('game_screen');
-        var y = 4 * 50;
         var x = core.x * 50;
+        var y = core.y * 50;
 
         var context = canvas.getContext('2d');
-        context.fillStyle = "rgb(127, 127, 127)";
+        context.fillStyle = "rgb(200, 127, 127)";
         context.beginPath();
         context.moveTo(x, y);
         context.lineTo(x+50, y);
@@ -103,23 +114,78 @@
     var key_down = 40;
 
     scope.update = function() {
+        if (crane.state == crane_state_placing) {
+            var now = Date.now();
+            if (1000 < now - crane.last_animation_tick) {
+                crane.y += 1;
+                if (crane.held_item != undefined) {
+                    crane.held_item.y += 1;
+                }
+                crane.last_animation_tick = now;
+
+                var y_offset_to_check;
+                if (crane.held_item == undefined) {
+                    var check_y = crane.y + 1;
+                    var check_x = crane.x;
+                    if (check_x == core.x && check_y == core.y) {
+                        crane.held_item = core;
+                        crane.state = crane_state_rising;
+                    } else if (level[check_y][check_y] == wall) {
+                        crane.state = crane_state_rising;
+                    }
+                } else {
+                    if (level[crane.y + 2][crane.x] == wall) {
+                        crane.held_item = undefined;
+                        crane.state = crane_state_rising;
+                    }
+                }
+            }        
+        }
+
+        if (crane.state == crane_state_rising) {
+            var now = Date.now();
+            if (1000 < now - crane.last_animation_tick) {
+                crane.y -= 1;
+                if (crane.held_item != undefined) {
+                    crane.held_item.y -= 1;
+                }
+                crane.last_animation_tick = now;
+                if (crane.y == 1) {
+                    crane.state = crane_state_ceiling;
+                }
+            }        
+        }
+
+        if (key_down in keysDown && crane.state == crane_state_ceiling) {
+            crane.state = crane_state_placing;
+        }
+
         if (key_left in keysDown) {
-            if (2 <= crane.x) {
-                crane.x -= 1;
+            if (crane.state == crane_state_ceiling) {
+                if (2 <= crane.x) {
+                    crane.x -= 1;
+                    if (crane.held_item != undefined) {
+                        crane.held_item.x -= 1;
+                    }
+                }
+                delete keysDown[key_left];
             }
-            delete keysDown[key_left];
         }
 
         if (key_right in keysDown) {
-            if (crane.x <= 6) {
-                crane.x += 1;
+            if (crane.state == crane_state_ceiling) {
+                if (crane.x <= 6) {
+                    crane.x += 1;
+                    if (crane.held_item != undefined) {
+                        crane.held_item.x += 1;
+                    }
+                }
+                delete keysDown[key_right];
             }
-            delete keysDown[key_right];
         }
         draw_level();
         draw_crane();
         draw_reactor();
     }
 
-    window.setInterval(update, 1);
-}(window))
+    window.setInterval(update, 1);}(window))
