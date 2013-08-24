@@ -1,3 +1,4 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML1.1//END" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html>
     <head>
         <title> Save the ship! Ditch the reactor! </title>
@@ -29,11 +30,15 @@
         [wall, wall , wall , wall , wall , wall , wall , wall , wall],
     ];
     
+    var leads = [
+        { x : 3, y : 4 }
+    ];
+
     var core = {
         x : 1,
         y : 4,
         heat : 0
-    }
+    };
 
     var crane = {
         x : 1,
@@ -138,6 +143,20 @@
         context.fill();
     }
 
+    function draw_control_rods() {
+        var canvas = document.getElementById('game_screen');
+        var context = canvas.getContext('2d');
+        for (var i = 0; i < leads.length; i++) {
+            var x = leads[i].x * 50;
+            var y = leads[i].y * 50;
+            context.fillStyle = "rgb(100, 100, 100)";
+            context.fillRect(x+5, y+5, 8, 40);
+            context.fillRect(x+15, y+5, 8, 40);
+            context.fillRect(x+25, y+5, 8, 40);
+            context.fillRect(x+35, y+5, 8, 40);
+        }
+    }
+
     function draw_reactor_status() {
         var canvas = document.getElementById('game_screen');
         var context = canvas.getContext('2d');
@@ -190,6 +209,15 @@
         context.fontStyle = "30pt Arial";
         context.fillText("You saved the day", 180, 200);
     }
+
+    function is_lead(item) {
+        for (var i = 0; i < leads.length; i++) {
+            if (leads[i] == item) {
+                return true;
+            }
+        }
+        return false;
+    }
     function update_in_crane_state() {
         if (crane.state == crane_state_placing) {
             var now = Date.now();
@@ -207,14 +235,33 @@
                     if (check_x == core.x && check_y == core.y) {
                         crane.held_item = core;
                         crane.state = crane_state_rising;
-                    } else if (level[check_y][check_y] == wall) {
+                    } else if (check_x == chute.x && check_y == chute.y) {
+                        crane.state = crange_state_rising;
+                    } else if (level[check_y][check_x] == wall) {
                         crane.state = crane_state_rising;
+                    } else {
+                        for (var i = 0; i < leads.length; i++) {
+                            if (check_x == leads[i].x && check_y == leads[i].y) {
+                                crane.state = crane_state_rising;
+                                crane.held_item = leads[i];
+                            }
+                        }
                     }
                 } else {
                     if (crane.y + 1 == chute.y && crane.x == chute.x) {
                         if (crane.held_item == core) {
                             game_state = game_state_victory;
                         } else {
+                            crane.state = crane_state_rising;
+                        }
+                    } else if (is_lead(crane.held_item)) {
+                        if (crane.y + 1 == core.y && crane.x == core.x) {
+                            core.heat -= 10;
+                            for (var i = 0; i < leads.length; i++) {
+                                if (leads[i] == crane.held_item) break;
+                            }
+                            leads.splice(i, 1);
+                            crane.held_item = undefined;
                             crane.state = crane_state_rising;
                         }
                     } else if (level[crane.y + 2][crane.x] == wall) {
@@ -275,7 +322,7 @@
         draw_reactor();
         draw_reactor_status();
         draw_chute();
-
+        draw_control_rods();
         if (core.heat == max_heat) {
             game_state = game_state_gameover;
         }
