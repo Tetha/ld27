@@ -1,3 +1,14 @@
+3: Add the chute
+5: Add picking up lead
+4: Add the lead
+6: Add dropping the lead into the reactor
+8: Add picking up the reactor core without lead inserted
+9: Add picking up the reactor with lead inserted
+10: Add dropping the reactor into the chute
+11: Add dropping the reactor core
+13: Display some textbox explaining the mission and the controls
+
+- done -
 1: Setup index.html -done-
 2: Get the crane moving around in an empty box -done-
     2.1: Display box -done-
@@ -6,14 +17,6 @@
     2.4: Make crane respect walls -done-
 - about 1 hour in-
 14: Add picking up something (reactor) -done-
-3: Add the chute
-4: Add the lead
-5: Add picking up lead
-6: Add dropping the lead into the reactor
 7: Add the reactor core in one place -done-
-8: Add picking up the reactor core without lead inserted
-9: Add picking up the reactor with lead inserted
-10: Add dropping the reactor into the chute
-11: Add dropping the reactor core
 12: Add move limit -done-
-13: Display some textbox explaining the mission and the controls
+- about 5 hours in -
