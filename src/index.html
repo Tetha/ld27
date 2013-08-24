@@ -21,45 +21,48 @@
     var game_state_crane = "crane";
 
     var game_state = game_state_crane;
-    var level = [
-        [wall, wall , wall , wall , wall , wall , wall , wall , wall],
-        [wall, empty, empty, empty, empty, empty, empty, empty, wall],   
-        [wall, empty, empty, empty, empty, empty, empty, empty, wall],   
-        [wall, empty, empty, empty, empty, empty, empty, empty, wall],   
-        [wall, empty, wall , empty, wall , empty, wall , empty, wall],   
-        [wall, wall , wall , wall , wall , wall , wall , wall , wall],
-    ];
+
+    var level_state = {
+        level : [
+            [wall, wall , wall , wall , wall , wall , wall , wall , wall],
+            [wall, empty, empty, empty, empty, empty, empty, empty, wall],   
+            [wall, empty, empty, empty, empty, empty, empty, empty, wall],   
+            [wall, empty, empty, empty, empty, empty, empty, empty, wall],   
+            [wall, empty, wall , empty, wall , empty, wall , empty, wall],   
+            [wall, wall , wall , wall , wall , wall , wall , wall , wall],
+        ],
     
-    var leads = [
-        { x : 3, y : 4 }
-    ];
+        leads : [
+            { x : 3, y : 4 }
+        ],
 
-    var core = {
-        x : 1,
-        y : 4,
-        heat : 0
+        core : {
+            x : 1,
+            y : 4,
+            heat : 0
+        },
+
+        crane : {
+            x : 1,
+            y : 1,
+            held_item : undefined,
+            state : crane_state_ceiling,
+            last_animation_tick : Date.now()
+        },
+
+        chute : {
+            x : 7,
+            y : 4
+        }
     };
-
-    var crane = {
-        x : 1,
-        y : 1,
-        held_item : undefined,
-        state : crane_state_ceiling,
-        last_animation_tick : Date.now()
-    };
-
-    var chute = {
-        x : 7,
-        y : 4
-    }
 
     var keysDown = {};
 
     function draw_level() {
         var canvas = document.getElementById('game_screen');
-        for (var y = 0; y < level.length; y++) {
-            for (var x = 0; x < level[y].length; x++) {
-                var tile = level[y][x];
+        for (var y = 0; y < level_state.level.length; y++) {
+            for (var x = 0; x < level_state.level[y].length; x++) {
+                var tile = level_state.level[y][x];
                 var context = canvas.getContext('2d');
                 if (tile === wall) {
                     context.fillStyle = "rgb(127, 127, 255)";
@@ -75,8 +78,8 @@
 
     function draw_crane() {
         var canvas = document.getElementById('game_screen');
-        var x = crane.x * 50;
-        var y = crane.y * 50;
+        var x = level_state.crane.x * 50;
+        var y = level_state.crane.y * 50;
         
         var context = canvas.getContext('2d');
         context.fillStyle="rgb(127,127,127)";
@@ -92,8 +95,8 @@
 
     function draw_chute() {
         var canvas = document.getElementById('game_screen');
-        var x = chute.x * 50;
-        var y = chute.y * 50;
+        var x = level_state.chute.x * 50;
+        var y = level_state.chute.y * 50;
         
         var context = canvas.getContext('2d');
         context.fillStyle = "rgb(125, 125, 125)";
@@ -112,8 +115,8 @@
 
     function draw_reactor() {
         var canvas = document.getElementById('game_screen');
-        var x = core.x * 50;
-        var y = core.y * 50;
+        var x = level_state.core.x * 50;
+        var y = level_state.core.y * 50;
 
         var context = canvas.getContext('2d');
         context.fillStyle = "rgb(200, 127, 127)";
@@ -146,9 +149,9 @@
     function draw_control_rods() {
         var canvas = document.getElementById('game_screen');
         var context = canvas.getContext('2d');
-        for (var i = 0; i < leads.length; i++) {
-            var x = leads[i].x * 50;
-            var y = leads[i].y * 50;
+        for (var i = 0; i < level_state.leads.length; i++) {
+            var x = level_state.leads[i].x * 50;
+            var y = level_state.leads[i].y * 50;
             context.fillStyle = "rgb(100, 100, 100)";
             context.fillRect(x+5, y+5, 8, 40);
             context.fillRect(x+15, y+5, 8, 40);
@@ -164,7 +167,7 @@
         context.fillRect(10, 300, 450, 100);
         context.fillStyle = "rgb(0, 0, 0)";
         context.font = "20pt Arial";
-        context.fillText("Meltdown -" + (max_heat - core.heat)+ "s", 10, 350);
+        context.fillText("Meltdown -" + (max_heat - level_state.core.heat)+ "s", 10, 350);
     }
 
     scope.addEventListener("keydown", function(e) {
@@ -211,94 +214,103 @@
     }
 
     function is_lead(item) {
-        for (var i = 0; i < leads.length; i++) {
-            if (leads[i] == item) {
+        for (var i = 0; i < level_state.leads.length; i++) {
+            if (level_state.leads[i] == item) {
                 return true;
             }
         }
         return false;
     }
+
+    function contains_lead(y, x) {
+        for (var i = 0; i < level_state.leads.length; i++) {
+            if (level_state.leads[i].x == x && level_state.leads[i].y == y) return true;
+        }
+        return false;    
+    }
+
     function update_in_crane_state() {
-        if (crane.state == crane_state_placing) {
+        if (level_state.crane.state == crane_state_placing) {
             var now = Date.now();
-            if (crane_update_frequency < now - crane.last_animation_tick) {
-                crane.y += 1;
-                if (crane.held_item != undefined) {
-                    crane.held_item.y += 1;
-                }
-                crane.last_animation_tick = now;
+            if (crane_update_frequency < now - level_state.crane.last_animation_tick) {
+                level_state.crane.y += 1;
+                level_state.crane.last_animation_tick = now;
 
                 var y_offset_to_check;
-                if (crane.held_item == undefined) {
-                    var check_y = crane.y + 1;
-                    var check_x = crane.x;
-                    if (check_x == core.x && check_y == core.y) {
-                        crane.held_item = core;
-                        crane.state = crane_state_rising;
-                    } else if (check_x == chute.x && check_y == chute.y) {
-                        crane.state = crange_state_rising;
-                    } else if (level[check_y][check_x] == wall) {
-                        crane.state = crane_state_rising;
+                if (level_state.crane.held_item == undefined) {
+                    var check_y = level_state.crane.y + 1;
+                    var check_x = level_state.crane.x;
+                    if (check_x == level_state.core.x && check_y == level_state.core.y) {
+                        level_state.crane.held_item = level_state.core;
+                        level_state.crane.state = crane_state_rising;
+                    } else if (check_x == level_state.chute.x && check_y == level_state.chute.y) {
+                        level_state.crane.state = crange_state_rising;
+                    } else if (level_state.level[check_y][check_x] == wall) {
+                        level_state.crane.state = crane_state_rising;
                     } else {
-                        for (var i = 0; i < leads.length; i++) {
-                            if (check_x == leads[i].x && check_y == leads[i].y) {
-                                crane.state = crane_state_rising;
-                                crane.held_item = leads[i];
+                        for (var i = 0; i < level_state.leads.length; i++) {
+                            if (check_x == level_state.leads[i].x && check_y == level_state.leads[i].y) {
+                                level_state.crane.state = crane_state_rising;
+                                level_state.crane.held_item = level_state.leads[i];
                             }
                         }
                     }
                 } else {
-                    if (crane.y + 1 == chute.y && crane.x == chute.x) {
-                        if (crane.held_item == core) {
+                    level_state.crane.held_item.y += 1;
+                    if (level_state.crane.held_item == level_state.core) {
+                        if (level_state.crane.y + 1 == level_state.chute.y && level_state.crane.x == level_state.chute.x) {
                             game_state = game_state_victory;
-                        } else {
-                            crane.state = crane_state_rising;
+                        } else if (level_state.level[level_state.crane.y + 2][level_state.crane.x] == wall) {
+                            level_state.crane.held_item = undefined;
+                            level_state.crane.state = crane_state_rising;
+                        } else if (contains_lead(level_state.crane.y + 2, level_state.crane.x)) {
+                            level_state.crane.state = crane_state_rising;
                         }
-                    } else if (is_lead(crane.held_item)) {
-                        if (crane.y + 1 == core.y && crane.x == core.x) {
-                            core.heat -= 10;
-                            for (var i = 0; i < leads.length; i++) {
-                                if (leads[i] == crane.held_item) break;
+                    } else if (is_lead(level_state.crane.held_item)) {
+                        if (level_state.crane.y + 1 == level_state.core.y && level_state.crane.x == level_state.core.x) {
+                            level_state.core.heat -= 10;
+                            for (var i = 0; i < level_state.leads.length; i++) {
+                                if (level_state.leads[i] == level_state.crane.held_item) break;
                             }
-                            leads.splice(i, 1);
-                            crane.held_item = undefined;
-                            crane.state = crane_state_rising;
+                            level_state.leads.splice(i, 1);
+                            level_state.crane.held_item = undefined;
+                            level_state.crane.state = crane_state_rising;
                         }
-                    } else if (level[crane.y + 2][crane.x] == wall) {
-                        crane.held_item = undefined;
-                        crane.state = crane_state_rising;
+                    } else if (level_state.level[level_state.crane.y + 2][level_state.crane.x] == wall) {
+                        level_state.crane.held_item = undefined;
+                        level_state.crane.state = crane_state_rising;
                     }
                 }
             }        
         }
 
-        if (crane.state == crane_state_rising) {
+        if (level_state.crane.state == crane_state_rising) {
             var now = Date.now();
-            if (crane_update_frequency < now - crane.last_animation_tick) {
-                crane.y -= 1;
-                if (crane.held_item != undefined) {
-                    crane.held_item.y -= 1;
+            if (crane_update_frequency < now - level_state.crane.last_animation_tick) {
+                level_state.crane.y -= 1;
+                if (level_state.crane.held_item != undefined) {
+                    level_state.crane.held_item.y -= 1;
                 }
-                crane.last_animation_tick = now;
-                if (crane.y == 1) {
-                    crane.state = crane_state_ceiling;
+                level_state.crane.last_animation_tick = now;
+                if (level_state.crane.y == 1) {
+                    level_state.crane.state = crane_state_ceiling;
                 }
             }        
         }
 
-        if (key_down in keysDown && crane.state == crane_state_ceiling) {
-            crane.state = crane_state_placing;
-            core.heat++;
+        if (key_down in keysDown && level_state.crane.state == crane_state_ceiling) {
+            level_state.crane.state = crane_state_placing;
+            level_state.core.heat++;
             delete keysDown[key_down];
         }
 
         if (key_left in keysDown) {
-            if (crane.state == crane_state_ceiling) {
-                if (2 <= crane.x) {
-                    crane.x -= 1;
-                    core.heat++;
-                    if (crane.held_item != undefined) {
-                        crane.held_item.x -= 1;
+            if (level_state.crane.state == crane_state_ceiling) {
+                if (2 <= level_state.crane.x) {
+                    level_state.crane.x -= 1;
+                    level_state.core.heat++;
+                    if (level_state.crane.held_item != undefined) {
+                        level_state.crane.held_item.x -= 1;
                     }
                 }
                 delete keysDown[key_left];
@@ -306,12 +318,12 @@
         }
 
         if (key_right in keysDown) {
-            if (crane.state == crane_state_ceiling) {
-                if (crane.x <= 6) {
-                    crane.x += 1;
-                    core.heat++;
-                    if (crane.held_item != undefined) {
-                        crane.held_item.x += 1;
+            if (level_state.crane.state == crane_state_ceiling) {
+                if (level_state.crane.x <= 6) {
+                    level_state.crane.x += 1;
+                    level_state.core.heat++;
+                    if (level_state.crane.held_item != undefined) {
+                        level_state.crane.held_item.x += 1;
                     }
                 }
                 delete keysDown[key_right];
@@ -323,7 +335,7 @@
         draw_reactor_status();
         draw_chute();
         draw_control_rods();
-        if (core.heat == max_heat) {
+        if (level_state.core.heat == max_heat) {
             game_state = game_state_gameover;
         }
     }
