@@ -8,6 +8,11 @@
     var crane_state_placing = "placing";
     var crane_state_rising = "rising";
 
+    var max_heat = 10;
+
+    var game_state_gameover = "gameover";
+    var game_state_crane = "crane";
+    var game_state = game_state_crane;
     var level = [
         [wall, wall , wall , wall , wall , wall , wall , wall , wall],
         [wall, empty, empty, empty, empty, empty, empty, empty, wall],   
@@ -19,14 +24,15 @@
     
     var core = {
         x : 1,
-        y : 2
+        y : 4,
+        heat : 0
     }
 
     var crane = {
         x : 1,
         y : 1,
-        held_item : core,
-        state : crane_state_placing,
+        held_item : undefined,
+        state : crane_state_ceiling,
         last_animation_tick : Date.now()
     };
 
@@ -100,6 +106,16 @@
         context.fill();
     }
 
+    function draw_reactor_status() {
+        var canvas = document.getElementById('game_screen');
+        var context = canvas.getContext('2d');
+        context.fillStyle = "rgb(255, 255, 255)";
+        context.fillRect(10, 300, 450, 100);
+        context.fillStyle = "rgb(0, 0, 0)";
+        context.font = "20pt Arial";
+        context.fillText("Meltdown -" + (max_heat - core.heat)+ "s", 10, 350);
+    }
+
     scope.addEventListener("keydown", function(e) {
         keysDown[e.keyCode] = true;
     }, false);
@@ -114,6 +130,24 @@
     var key_down = 40;
 
     scope.update = function() {
+        if (game_state == game_state_crane) {
+            update_in_crane_state();
+        } else if (game_state == game_state_gameover) {
+            update_in_gameover_state();
+        }
+    }
+
+    function update_in_gameover_state() {
+        var canvas = document.getElementById('game_screen');
+        var context = canvas.getContext('2d');
+        context.fillStyle = "rgb(255, 0, 0)";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.fillStyle = "rgb(0, 0, 0)";
+        context.fontStyle = "30pt Arial";
+        context.fillText("BOOM", 180, 200);
+    }
+
+    function update_in_crane_state() {
         if (crane.state == crane_state_placing) {
             var now = Date.now();
             if (1000 < now - crane.last_animation_tick) {
@@ -158,12 +192,15 @@
 
         if (key_down in keysDown && crane.state == crane_state_ceiling) {
             crane.state = crane_state_placing;
+            core.heat++;
+            delete keysDown[key_down];
         }
 
         if (key_left in keysDown) {
             if (crane.state == crane_state_ceiling) {
                 if (2 <= crane.x) {
                     crane.x -= 1;
+                    core.heat++;
                     if (crane.held_item != undefined) {
                         crane.held_item.x -= 1;
                     }
@@ -176,6 +213,7 @@
             if (crane.state == crane_state_ceiling) {
                 if (crane.x <= 6) {
                     crane.x += 1;
+                    core.heat++;
                     if (crane.held_item != undefined) {
                         crane.held_item.x += 1;
                     }
@@ -186,6 +224,11 @@
         draw_level();
         draw_crane();
         draw_reactor();
+        draw_reactor_status();
+
+        if (core.heat == max_heat) {
+            game_state = game_state_gameover;
+        }
     }
 
     window.setInterval(update, 1);}(window))
