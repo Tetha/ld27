@@ -1,3 +1,4 @@
+14: BUG: can't handle directly colliding before even going into the placing state
 13: Display some textbox explaining the mission and the controls
 
 - done -
