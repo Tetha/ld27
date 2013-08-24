@@ -1,6 +1,6 @@
-1: Setup index.html
+1: Setup index.html -done-
 2: Get the crane moving around in an empty box
-    2.1: Display box
+    2.1: Display box -done-
     2.2: Display crane in position
     2.3: Make crane respond to keys
     2.4: Make crane respect walls
