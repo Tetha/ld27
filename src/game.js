@@ -67,12 +67,16 @@
 
     scope.update = function() {
         if (key_left in keysDown) {
-            crane.x -= 1;
+            if (2 <= crane.x) {
+                crane.x -= 1;
+            }
             delete keysDown[key_left];
         }
 
         if (key_right in keysDown) {
-            crane.x += 1;
+            if (crane.x <= 6) {
+                crane.x += 1;
+            }
             delete keysDown[key_right];
         }
         draw_level();
