@@ -40,6 +40,11 @@
         last_animation_tick : Date.now()
     };
 
+    var chute = {
+        x : 7,
+        y : 4
+    }
+
     var keysDown = {};
 
     function draw_level() {
@@ -75,6 +80,26 @@
         context.lineTo(x+15, y+40);
         context.lineTo(x+30, y);
         context.fill();
+    }
+
+    function draw_chute() {
+        var canvas = document.getElementById('game_screen');
+        var x = chute.x * 50;
+        var y = chute.y * 50;
+        
+        var context = canvas.getContext('2d');
+        context.fillStyle = "rgb(125, 125, 125)";
+        context.fillRect(x, y, 50, 50);
+
+        context.fillStyle = "rgb(0, 0, 100)";
+        context.fillRect(x+10, y+10, 30, 30);
+
+        context.fillStyle = "rgb(255, 255, 255)";
+        context.fillRect(x + 20, y+15, 2, 2);
+        context.fillRect(x + 12, y+28, 2, 2);
+        context.fillRect(x + 28, y+32, 2, 2);
+        context.fillRect(x + 33, y+19, 2, 2);
+    
     }
 
     function draw_reactor() {
@@ -229,6 +254,7 @@
         draw_crane();
         draw_reactor();
         draw_reactor_status();
+        draw_chute();
 
         if (core.heat == max_heat) {
             game_state = game_state_gameover;
