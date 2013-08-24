@@ -1,0 +1,17 @@
+1: Setup index.html
+2: Get the crane moving around in an empty box
+    2.1: Display box
+    2.2: Display crane in position
+    2.3: Make crane respond to keys
+    2.4: Make crane respect walls
+3: Add the chute
+4: Add the lead
+5: Add picking up lead
+6: Add dropping the lead into the reactor
+7: Add the reactor core in one place
+8: Add picking up the reactor core without lead inserted
+9: Add picking up the reactor with lead inserted
+10: Add dropping the reactor into the chute
+11: Add dropping the reactor core
+12: Add move limit
+13: Display some textbox explaining the mission and the controls
