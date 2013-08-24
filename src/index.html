@@ -22,6 +22,26 @@
 
     var game_state = game_state_crane;
 
+    var current_level = 0;
+    var levels = [
+        { 
+            level : [
+                [wall, wall , wall , wall , wall , wall , wall , wall , wall],
+                [wall, empty, empty, empty, empty, empty, empty, empty, wall],   
+                [wall, empty, empty, empty, empty, empty, empty, empty, wall],   
+                [wall, empty, empty, empty, empty, empty, empty, empty, wall],   
+                [wall, empty, wall , empty, wall , empty, wall , empty, wall],   
+                [wall, wall , wall , wall , wall , wall , wall , wall , wall],
+            ],
+        
+            leads : [
+                    { x : 3, y : 4 }
+            ],
+            core  : { x : 1, y : 4},
+            crane : { x : 1, y : 1 },
+            chute : { x : 7, y : 4 }
+        }
+    ];
     var level_state = {
         level : [
             [wall, wall , wall , wall , wall , wall , wall , wall , wall],
@@ -339,8 +359,36 @@
             game_state = game_state_gameover;
         }
     }
+    
+    function shallow_clone(obj) {
+        var result = {};
+        for (var v in obj) {
+            result[v] = obj[v];
+        }
+        return result;
+    }
+    function init_level(index) {
+        level_state = {};
+        level_state.level = levels[index].level.slice(0); 
 
+        level_state.leads = [];
+        for (var i = 0; i < levels[index].leads.length; i++) {
+            level_state.leads[i] = shallow_clone(levels[index].leads[i]);
+        }
+        
+        level_state.core = shallow_clone(levels[index].core);
+        level_state.core.heat = 0;
+
+        level_state.crane = shallow_clone(levels[index].crane);
+        level_state.crane.held_item = undefined;
+        level_state.crane.state = crane_state_ceiling;
+        level_state.crane.last_animation_tick = Date.now();
+
+        level_state.chute = shallow_clone(levels[index].chute);
+    }
+    init_level(0);
     window.setInterval(update, 1);}(window))
+
          </script>
         <style type="text/css">
             canvas { border:1px solid black; }
