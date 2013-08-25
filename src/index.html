@@ -25,11 +25,13 @@
     var crane_update_frequency = 250;
     var max_heat = 10;
     var lead_cooldown = 15;
+    
+    var game_state_title = "title";
     var game_state_gameover = "gameover";
     var game_state_victory = "victory";
     var game_state_crane = "crane";
 
-    var game_state = game_state_crane;
+    var game_state = game_state_title;
     var current_level = 0;
     var levels = [
         { 
@@ -184,10 +186,10 @@
         }
     }
 
-    function draw_chute() {
+    function draw_chute(chute_x, chute_y) {
         var canvas = document.getElementById('game_screen');
-        var x = level_state.chute.x * 50;
-        var y = level_state.chute.y * 50;
+        var x = chute_x * 50;
+        var y = chute_y * 50;
         
         var context = canvas.getContext('2d');
         context.fillStyle = "rgb(125, 125, 125)";
@@ -204,10 +206,10 @@
     
     }
 
-    function draw_reactor() {
+    function draw_reactor(core_x, core_y) {
         var canvas = document.getElementById('game_screen');
-        var x = level_state.core.x * 50;
-        var y = level_state.core.y * 50;
+        var x = core_x * 50;
+        var y = core_y * 50;
 
         var context = canvas.getContext('2d');
         context.fillStyle = "rgb(200, 127, 127)";
@@ -310,12 +312,46 @@
     }, false);
 
     scope.update = function() {
-        if (game_state == game_state_crane) {
+        if (game_state == game_state_title) {
+            update_in_title_state();
+        } else if (game_state == game_state_crane) {
             update_in_crane_state();
         } else if (game_state == game_state_gameover) {
             update_in_gameover_state();
         } else if (game_state == game_state_victory) {
             update_in_victory_state();
+        }
+    }
+
+    function update_in_title_state() {
+        var canvas = document.getElementById('game_screen');
+        var context = canvas.getContext('2d');
+        context.fillStyle = "rgb(50, 50, 80)";
+        context.fillRect(0, 0,canvas.width, canvas.height);
+        context.fillStyle = "rgb(255,255,255)";
+        context.font = "14pt Arial";
+        context.fillText("Engineer! The reactors are about to blow!", 50, 50);    
+        context.fillText("You have to toss the reactor into the chute!", 50, 100);
+        draw_reactor(2, 3);
+        draw_chute(6, 3);
+        context.fillStyle = "rgb(200,200,255)";
+        context.beginPath();
+        context.moveTo(160, 170);
+        context.lineTo(250, 170);
+        context.lineTo(250, 150);
+        context.lineTo(290, 175);
+        context.lineTo(250, 200);
+        context.lineTo(250, 180);
+        context.lineTo(160, 180);
+        context.fill();
+        context.fillStyle = "rgb(255,255,255)";
+        context.font = "14pt Arial";
+        context.fillText("Press Return to Start", 150, 350);
+        if (key_return in keysDown) {
+            init_level(0);
+            current_level = 0;
+            game_state = game_state_crane;
+            delete keysDown[key_return];
         }
     }
 
@@ -325,10 +361,10 @@
         context.fillStyle = "rgb(255, 0, 0)";
         context.fillRect(0, 0, canvas.width, canvas.height);
         context.fillStyle = "rgb(0, 0, 0)";
-        context.fontStyle = "30pt Arial";
+        context.font = "30pt Arial";
         context.fillText("BOOM", 180, 100);
 
-        context.fontStyle = "20pt Arial";
+        context.font = "20pt Arial";
         context.fillText("Press return to try again", 100, 200);
 
         if (key_return in keysDown) {
@@ -346,7 +382,7 @@
         context.fillStyle = "rgb(0, 0, 0)";
 
         if (current_level + 1 < levels.length) {
-            context.fontStyle="20pt Arial";
+            context.font="20pt Arial";
             context.fillText("Go go there's more to ditch!", 100, 100);
             context.fillText("Press Enter for next level", 100, 200);
             if (key_return in keysDown) {
@@ -356,7 +392,7 @@
                 game_state = game_state_crane;
             }
         } else {
-            context.fontStyle = "20pt Arial";
+            context.font = "20pt Arial";
             context.fillText("Phew, that's the last of them!", 100, 100);
             context.fillText("You saved the day!", 100, 200);
         }
@@ -521,9 +557,9 @@
         }
         draw_level();
         draw_crane();
-        draw_reactor();
+        draw_reactor(level_state.core.x, level_state.core.y);
         draw_reactor_status();
-        draw_chute();
+        draw_chute(level_state.chute.x, level_state.chute.y);
         draw_control_rods();
         draw_red_lock();
         draw_red_key();
