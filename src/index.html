@@ -126,12 +126,28 @@
         context.fillStyle="rgb(127,127,127)";
         context.beginPath();
         context.moveTo(x + 20, y);
+        context.lineTo(x+20, y+10);
+        context.lineTo(x, y+30);
         context.lineTo(x, y+50);
-        context.lineTo(x+50, y+50);
+        context.lineTo(x+10, y+40);
+        context.lineTo(x+10, y+30);
+        context.lineTo(x+20, y+20);
+        context.lineTo(x+30, y+20);
+        context.lineTo(x+40, y+30);
         context.lineTo(x+40, y+40);
-        context.lineTo(x+15, y+40);
+        context.lineTo(x+50, y+50);
+        context.lineTo(x+50, y+30);
+        context.lineTo(x+30, y+10);
         context.lineTo(x+30, y);
+        context.lineTo(x+20, y);
         context.fill();
+
+        if (level_state.crane.state == crane_state_placing || level_state.crane.state == crane_state_rising) {
+            for (var rod_y = 1; rod_y < level_state.crane.y; rod_y++) {
+                var rod_y_screen = 50 * rod_y;
+                context.fillRect(x+20, rod_y_screen, 10, 50);
+            }
+        }
     }
 
     function draw_chute() {
