@@ -118,7 +118,13 @@
                         context.fillStyle = "rgb(255, 0, 0)";
                         context.fillRect(50*x + 20, 50*y, 10, 50);
                         context.fillRect(50*x, 50*y+20, 50, 10);
-                    }
+                        context.strokeStyle = "rgb(80, 80, 200)";
+                        context.lineWidth = 3;
+                        context.strokeRect(50*x, 50*y, 50, 50);
+                    } else {
+                        context.fillStyle = "rgb(20, 20, 60)";
+                        context.fillRect(50 * x, 50 * y, 50, 50);
+                    } 
                 } else {
                     context.fillStyle = "rgb(255, 0, 0)";
                     context.fillRect(50 * x, 50 * y, 50, 50);
@@ -383,8 +389,8 @@
         if (level_state.core.x == x && level_state.core.y == y) return true;
         if (level_state.crane.x == x && level_state.crane.y == y) return true;
         if (level_state.chute.x == x && level_state.chute.y == y) return true;
-        if (level_state.red_lock.x == x && level_state.red_lock.y == y) return true;
-        if (level_state.red_key.x == x && level_state.red_key.y == y) return true;
+        if (level_state.red_lock != undefined && level_state.red_lock.x == x && level_state.red_lock.y == y) return true;
+        if (level_state.red_key != undefined && level_state.red_key.x == x && level_state.red_key.y == y) return true;
         if (contains_lead(y, x)) return true;
         return false;
     }
