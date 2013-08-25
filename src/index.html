@@ -100,8 +100,16 @@
                 if (tile === wall) {
                     context.fillStyle = "rgb(127, 127, 255)";
                     context.fillRect(50 * x, 50 * y, 50, 50);
+                    context.strokeStyle = "rgb(80, 80, 200)";
+                    context.lineWidth = 3;
+                    context.strokeRect(50*x, 50*y, 50, 50);
+                    context.lineWidth = 2;
+                    context.strokeRect(50 * x + 10, 50 * y + 10, 3, 3);
+                    context.strokeRect(50 * x + 35, 50 * y + 10, 3, 3);
+                    context.strokeRect(50 * x + 10, 50 * y + 35, 3, 3);
+                    context.strokeRect(50 * x + 35, 50 * y + 35, 3, 3);
                 } else if (tile === empty) {
-                    context.fillStyle = "rgb(0, 0, 0)";
+                    context.fillStyle = "rgb(20, 20, 60)";
                     context.fillRect(50 * x, 50 * y, 50, 50);
                 } else if (tile == red_door) {
                     if (level_state.red_lock.locked) {
