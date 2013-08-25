@@ -296,11 +296,44 @@
     function draw_reactor_status() {
         var canvas = document.getElementById('game_screen');
         var context = canvas.getContext('2d');
-        context.fillStyle = "rgb(255, 255, 255)";
+        context.fillStyle = "rgb(50, 50, 80)";
         context.fillRect(0, 300, 450, 100);
-        context.fillStyle = "rgb(0, 0, 0)";
+        context.fillStyle = "rgb(100, 100, 255)";
         context.font = "20pt Arial";
-        context.fillText("Meltdown -" + (max_heat - level_state.core.heat)+ "s", 10, 350);
+        context.fillText("Meltdown -" + (max_heat - level_state.core.heat)+ "s", 140, 330);
+
+
+        var active_colors = ["0, 255, 0",
+                             "100, 255, 0",
+                             "120, 220, 0",
+                             "150, 200, 0",
+                             "200, 200, 0",
+                             "255, 200, 0",
+                             "255, 150, 0",
+                             "255, 100, 0",
+                             "255, 50, 0",
+                             "255, 0, 0"];
+
+        var inactive_colors = ["0, 127, 0",
+                               "59, 127, 0",
+                               "60, 110, 0",
+                               "75, 100, 0",
+                               "100, 100, 0",
+                               "127, 100, 0",
+                               "127, 75, 0",
+                               "127, 50, 0",
+                               "127, 25, 0",
+                               "127, 0, 0"];
+        var remaining_heat = max_heat - level_state.core.heat;
+        var limit = active_colors.length - remaining_heat;
+        for (var i = 0; i < 10; i++) {
+            if (i != 0 && limit < i) {
+                context.fillStyle = "rgb(" + inactive_colors[i] + ")";
+            } else {
+                context.fillStyle = "rgb(" + active_colors[i] + ")";
+            }
+            context.fillRect(75 + i*30, 340, 25, 50);
+        }
     }
 
     function draw_red_lock() {
@@ -416,7 +449,7 @@
 
         if (current_level + 1 < levels.length) {
             context.font="20pt Arial";
-            context.fillText("Go go there's more to ditch!", 100, 100);
+            context.fillText("Go! There's more to ditch!", 100, 100);
             context.fillText("Press Enter for next level", 100, 200);
             if (key_return in keysDown) {
                 delete keysDown[key_return];
