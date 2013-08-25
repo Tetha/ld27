@@ -5,6 +5,12 @@
         <script type="text/javascript">
 (function(scope) {
     "use strict";
+    var key_left = 37;
+    var key_up = 38;
+    var key_right = 39;
+    var key_down = 40;
+    var key_return = 13;
+
     var empty = " ";
     var wall = "wall";
     var core = "core";
@@ -22,9 +28,41 @@
     var game_state_crane = "crane";
 
     var game_state = game_state_crane;
-
     var current_level = 0;
     var levels = [
+        { 
+            level : [
+                [wall, wall , wall , wall , wall , wall , wall , wall , wall],
+                [wall, empty, empty, empty, empty, empty, empty, empty, wall],   
+                [wall, empty, empty, empty, empty, empty, empty, empty, wall],   
+                [wall, empty, empty, empty, empty, empty, empty, empty, wall],   
+                [wall, empty, empty, empty, empty, empty, empty, empty, wall],   
+                [wall, wall , wall , wall , wall , wall , wall , wall , wall],
+            ],
+        
+            leads : [
+            ],
+            core  : { x : 3, y : 4},
+            crane : { x : 4, y : 1 },
+            chute : { x : 5, y : 4 },
+        },
+        { 
+            level : [
+                [wall, wall , wall , wall , wall , wall , wall , wall , wall],
+                [wall, empty, empty, empty, empty, empty, empty, empty, wall],   
+                [wall, empty, empty, empty, empty, empty, empty, empty, wall],   
+                [wall, empty, empty, empty, empty, empty, empty, empty, wall],   
+                [wall, empty, wall, empty, empty, empty, empty, empty, wall],   
+                [wall, wall , wall , wall , wall , wall , wall , wall , wall],
+            ],
+        
+            leads : [
+                { x : 2, y : 3 }
+            ],
+            core  : { x : 1, y : 4},
+            crane : { x : 7, y : 1 },
+            chute : { x : 7, y : 4 },
+        },
         { 
             level : [
                 [wall, wall , wall , wall , wall , wall , wall    , wall , wall],
@@ -167,7 +205,7 @@
         var canvas = document.getElementById('game_screen');
         var context = canvas.getContext('2d');
         context.fillStyle = "rgb(255, 255, 255)";
-        context.fillRect(10, 300, 450, 100);
+        context.fillRect(0, 300, 450, 100);
         context.fillStyle = "rgb(0, 0, 0)";
         context.font = "20pt Arial";
         context.fillText("Meltdown -" + (max_heat - level_state.core.heat)+ "s", 10, 350);
@@ -212,11 +250,6 @@
         delete keysDown[e.keyCode];
     }, false);
 
-    var key_left = 37;
-    var key_up = 38;
-    var key_right = 39;
-    var key_down = 40;
-
     scope.update = function() {
         if (game_state == game_state_crane) {
             update_in_crane_state();
@@ -243,8 +276,22 @@
         context.fillStyle = "rgb(0, 255, 0)";
         context.fillRect(0, 0, canvas.width, canvas.height);
         context.fillStyle = "rgb(0, 0, 0)";
-        context.fontStyle = "30pt Arial";
-        context.fillText("You saved the day", 180, 200);
+
+        if (current_level + 1 < levels.length) {
+            context.fontStyle="20pt Arial";
+            context.fillText("Go go there's more to ditch!", 100, 100);
+            context.fillText("Press Enter for next level", 100, 200);
+            if (key_return in keysDown) {
+                delete keysDown[key_return];
+                current_level += 1;
+                init_level(current_level);
+                game_state = game_state_crane;
+            }
+        } else {
+            context.fontStyle = "20pt Arial";
+            context.fillText("Phew, that's the last of them!", 100, 100);
+            context.fillText("You saved the day!", 100, 200);
+        }
     }
 
     function is_lead(item) {
