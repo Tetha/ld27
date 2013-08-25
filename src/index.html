@@ -267,7 +267,16 @@
         context.fillRect(0, 0, canvas.width, canvas.height);
         context.fillStyle = "rgb(0, 0, 0)";
         context.fontStyle = "30pt Arial";
-        context.fillText("BOOM", 180, 200);
+        context.fillText("BOOM", 180, 100);
+
+        context.fontStyle = "20pt Arial";
+        context.fillText("Press return to try again", 100, 200);
+
+        if (key_return in keysDown) {
+            delete keysDown[key_return];
+            init_level(current_level);
+            game_state = game_state_crane;
+        }
     }
 
     function update_in_victory_state() {
