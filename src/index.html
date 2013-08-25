@@ -10,7 +10,9 @@
     var key_right = 39;
     var key_down = 40;
     var key_return = 13;
-
+    var key_a = 65;
+    var key_d = 68;
+    var key_s = 83;
     var empty = " ";
     var wall = "wall";
     var core = "core";
@@ -232,13 +234,13 @@
             var x = level_state.leads[i].x * 50;
             var y = level_state.leads[i].y * 50;
             context.fillStyle = "rgb(127, 127, 127)";
-            context.fillRect(x+5, y+5, 8, 40);
-            context.fillRect(x+15, y+5, 8, 40);
-            context.fillRect(x+25, y+5, 8, 40);
-            context.fillRect(x+35, y+5, 8, 40);
+            context.fillRect(x+5, y+5, 8, 35);
+            context.fillRect(x+15, y+5, 8, 35);
+            context.fillRect(x+25, y+5, 8, 35);
+            context.fillRect(x+35, y+5, 8, 35);
             context.fillStyle = "rgb(80, 80, 80)";
             context.fillRect(x+5, y+5, 38, 10);
-            context.fillRect(x+19, y-10, 10, 15);
+            context.fillRect(x+20, y-10, 10, 15);
         }
     }
 
@@ -279,8 +281,10 @@
         var y = level_state.red_key.y * 50;
 
         context.fillStyle = "rgb(255, 0, 0)";
-        context.fillRect(x + 5, y + 5, 40, 10);
+        context.fillRect(x + 20, y + 5, 20, 10);
         context.fillRect(x + 20, y + 5, 10, 40);
+        context.fillStyle = "rgb(80,80,80)";
+        context.fillRect(x+20, y-10, 10, 15);
     }
 
     scope.addEventListener("keydown", function(e) {
@@ -391,10 +395,6 @@
                     if (check_x == level_state.core.x && check_y == level_state.core.y) {
                         level_state.crane.held_item = level_state.core;
                         level_state.crane.state = crane_state_rising;
-                    } else if (check_x == level_state.chute.x && check_y + 1 == level_state.chute.y) {
-                        // keep going
-                    } else if (level_state.red_lock != undefined && check_x == level_state.red_lock.x && check_y == level_state.red_lock.y) {
-                        level_state.crane.state = crane_state_rising;
                     } else if (level_state.red_key != undefined && check_x == level_state.red_key.x && check_y == level_state.red_key.y) {
                         level_state.crane.held_item = level_state.red_key;
                         level_state.crane.state = crane_state_rising;
@@ -407,6 +407,8 @@
                                 level_state.crane.held_item = level_state.leads[i];
                             }
                         }
+                    } else if (is_blocking_entity(check_y, check_x)) {
+                        level_state.crane.state = crane_state_rising;
                     }
                 } else {
                     level_state.crane.y += 1;
@@ -469,13 +471,14 @@
             }        
         }
 
-        if (key_down in keysDown && level_state.crane.state == crane_state_ceiling) {
+        if ((key_down in keysDown || key_s in keysDown) && level_state.crane.state == crane_state_ceiling) {
             level_state.crane.state = crane_state_placing;
             level_state.core.heat++;
             delete keysDown[key_down];
+            delete keysDown[key_s];
         }
 
-        if (key_left in keysDown) {
+        if (key_left in keysDown || key_a in keysDown) {
             if (level_state.crane.state == crane_state_ceiling) {
                 if (!is_wall(level_state.level[level_state.crane.y][level_state.crane.x -1])) {
                     level_state.crane.x -= 1;
@@ -485,10 +488,11 @@
                     }
                 }
                 delete keysDown[key_left];
+                delete keysDown[key_a];
             }
         }
 
-        if (key_right in keysDown) {
+        if (key_right in keysDown || key_d in keysDown) {
             if (level_state.crane.state == crane_state_ceiling) {
                 if (!is_wall(level_state.level[level_state.crane.y][level_state.crane.x+1])) {
                     level_state.crane.x += 1;
@@ -498,6 +502,7 @@
                     }
                 }
                 delete keysDown[key_right];
+                delete keysDown[key_d];
             }
         }
         draw_level();
