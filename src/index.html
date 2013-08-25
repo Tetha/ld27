@@ -231,11 +231,14 @@
         for (var i = 0; i < level_state.leads.length; i++) {
             var x = level_state.leads[i].x * 50;
             var y = level_state.leads[i].y * 50;
-            context.fillStyle = "rgb(100, 100, 100)";
+            context.fillStyle = "rgb(127, 127, 127)";
             context.fillRect(x+5, y+5, 8, 40);
             context.fillRect(x+15, y+5, 8, 40);
             context.fillRect(x+25, y+5, 8, 40);
             context.fillRect(x+35, y+5, 8, 40);
+            context.fillStyle = "rgb(80, 80, 80)";
+            context.fillRect(x+5, y+5, 38, 10);
+            context.fillRect(x+19, y-10, 10, 15);
         }
     }
 
