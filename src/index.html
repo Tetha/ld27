@@ -69,6 +69,23 @@
         },
         { 
             level : [
+                [wall, wall , wall , wall , wall , wall , wall , wall , wall],
+                [wall, empty, empty, empty, empty, empty, empty, empty, wall],   
+                [wall, empty, empty, empty, empty, empty, empty, empty, wall],   
+                [wall, empty, empty, empty, empty, empty, empty, empty, wall],   
+                [wall, empty, empty, empty, empty, empty, empty, empty, wall],   
+                [wall, wall , wall , wall , wall , wall , wall , wall , wall],
+            ],
+        
+            leads : [
+                { x : 6, y : 4 }
+            ],
+            core  : { x : 1, y : 4},
+            crane : { x : 4, y : 1 },
+            chute : { x : 7, y : 4 },
+        },
+        { 
+            level : [
                 [wall, wall , wall , wall , wall , wall , wall    , wall , wall],
                 [wall, empty, empty, empty, empty, empty, red_door, empty, wall],   
                 [wall, empty, empty, empty, empty, empty, empty   , empty, wall],   
@@ -331,7 +348,7 @@
         context.fillStyle = "rgb(255,255,255)";
         context.font = "14pt Arial";
         context.fillText("Engineer! The reactors are about to blow!", 50, 50);    
-        context.fillText("You have to toss the reactor into the chute!", 50, 100);
+        context.fillText("You have to toss the reactors into the chutes!", 50, 100);
         draw_reactor(2, 3);
         draw_chute(6, 3);
         context.fillStyle = "rgb(200,200,255)";
